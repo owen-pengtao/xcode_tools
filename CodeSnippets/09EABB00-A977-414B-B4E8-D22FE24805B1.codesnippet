@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDECodeSnippetCompletionScopes</key>
+	<array>
+		<string>CodeBlock</string>
+	</array>
+	<key>IDECodeSnippetContents</key>
+	<string>- (void)getDataFromURL
+{
+    NSString *url = [NSString stringWithFormat:@"http://%@/tb-api/api.php?m=term&amp;a=getAllArticleCategory&amp;json=1", [common getDomain]];
+    NSLog(@"url: %@", url);
+    
+    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    
+    [NSURLConnection sendAsynchronousRequest:urlRequest queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
+     {
+         if ([data length] &gt; 0 &amp;&amp; error == nil){
+             [self receivedData:data];
+         }else if ([data length] == 0 &amp;&amp; error == nil){
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [self emptyReply];
+             });
+         }else if (error != nil){
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [self requestError:error];
+             });
+         }
+     }];
+}
+
+- (NSMutableArray *)receivedData:(NSData *)data
+{
+    NSError *error;
+    NSDictionary *responseJSON = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&amp;error];
+    NSMutableArray *responseData = [responseJSON objectForKey:@"data"];
+    NSLog(@"responseJSON: %@", responseJSON);
+    return responseData;
+}
+- (void)emptyReply
+{
+    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Warning"
+                                                   message:@"No data respond from server."
+                                                  delegate:self
+                                         cancelButtonTitle:@"OK"
+                                         otherButtonTitles:nil];
+    [alert show];
+}
+- (void)timedOut
+{
+    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Warning"
+                                                   message:@"Time out."
+                                                  delegate:self
+                                         cancelButtonTitle:@"OK"
+                                         otherButtonTitles:nil];
+    [alert show];
+}
+- (void)requestError:(NSError *)error
+{
+    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Warning"
+                                                   message:error.localizedDescription
+                                                  delegate:self
+                                         cancelButtonTitle:@"OK"
+                                         otherButtonTitles:nil];
+    [alert show];
+}</string>
+	<key>IDECodeSnippetIdentifier</key>
+	<string>09EABB00-A977-414B-B4E8-D22FE24805B1</string>
+	<key>IDECodeSnippetLanguage</key>
+	<string>Xcode.SourceCodeLanguage.Objective-C</string>
+	<key>IDECodeSnippetSummary</key>
+	<string>send GET request to server</string>
+	<key>IDECodeSnippetTitle</key>
+	<string>getDataFromURL</string>
+	<key>IDECodeSnippetUserSnippet</key>
+	<true/>
+	<key>IDECodeSnippetVersion</key>
+	<integer>0</integer>
+</dict>
+</plist>
